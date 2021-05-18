@@ -1,0 +1,19 @@
+{
+  "name": "si-centralni-server",
+  "version": "1.0.0",
+  "description": "Korištena tehnologija: **NodeJS**",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EdisKrsmanovic/SI-Centralni-server.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/EdisKrsmanovic/SI-Centralni-server/issues"
+  },
+  "homepage": "https://github.com/EdisKrsmanovic/SI-Centralni-server#readme"
+}
