@@ -2,6 +2,8 @@
 
 Ovaj NodeJS projekat prati primjer strukture projekta koji se nalazi na [ovom linku!](https://github.com/MoathShraim/Nodejs-rest-api-project-structure-Express)
 
+Kao podsjetnik koristiti [prethodni projekat.](https://github.com/EdisKrsmanovic/SI-server-Grupa6)
+
 Korištene tehnologije: 
 - **NodeJS**
 - **SQLite** (zbog lakšeg pokretanja lokalno, inače je pametnije koristiti neki drugi DBMS)
