@@ -4,6 +4,7 @@ const cors = require('cors');
 const app = express();
 const userRoutes = require('./api/routes/userRoutes');
 const authRoutes = require('./api/routes/authRoutes');
+const faDefintionRoutes = require('./api/routes/faDefintionRoutes');
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -15,4 +16,5 @@ app.listen(3000, () => {
 
 app.use('/user', userRoutes)
 app.use('/auth', authRoutes)
+app.use('/faDefintion', faDefintionRoutes)
 
