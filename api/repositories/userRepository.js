@@ -1,6 +1,7 @@
 const sqlite = require('sqlite-sync');
 const bcrypt = require("bcrypt");
 sqlite.connect('baza.db')
+const bcrypt = require("bcrypt");
 
 exports.getUser = function (email) {
     const user = sqlite.run('SELECT * FROM User WHERE Email=?', [email]);
