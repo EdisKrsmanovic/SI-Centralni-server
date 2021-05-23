@@ -13,7 +13,11 @@ const pool = new pg.Pool({
 );
 
 exports.getUser = function (email) {
-    const user = sqlite.run('SELECT * FROM User WHERE Email=?', [email]);
+    const user = sqlite.run('SELECT * FROM User WHERE Email=$1::text', [email]).then(dbResponse=> {
+        console.log('User successfully retrievede.');
+      }, err1 => {
+        console.log("Error " + err1.message);
+    });;
     return user[0];
 }
 
@@ -24,24 +28,37 @@ exports.addUser = function (user) {
             return "NOT OK";
         }
     });
-    pool.query("INSERT INTO \"User\"(\"ID\",\"Email\",\"Password\",\"Uloga\") VALUES ((SELECT MAX(\"UserId\") + 1 FROM \"USER\"),$1::text,$2::text,$3::text)",[user.Email, hashedPass, user.Uloga]).then(dbResponse=> {
+    pool.query("INSERT INTO \"User\"(\"email\",\"password\",\"uloga\") VALUES ($1::text,$2::text,$3::text)",[user.Email, hashedPass, user.Uloga]).then(dbResponse=> {
         console.log('User successfully added.');
       }, err1 => {
-        console.log(err1.message);
+        console.log("Error " + err1.message);
     });
     return "OK";
 }
 
 exports.removeUser = function (email) {
-    sqlite.run('DELETE FROM User WHERE Email=?',[email]);
+    pool.query('DELETE FROM \"User\" WHERE \"email\"=$1::text',[email]).then(dbResponse=> {
+        console.log('User successfully deleted.');
+      }, err1 => {
+        console.log("Error " + err1.message);
+    });;
     return "OK";
 }
 
 exports.updateUser = function (info) {
-    sqlite.run("UPDATE User SET Uloga=? WHERE Email=?", [info.Uloga, info.Email]);
+    pool.query("UPDATE \"User\" SET \"uloga\"=$1::text WHERE \"email\"=$2::text", [info.Uloga, info.Email]).then(dbResponse=> {
+        console.log('User successfully updated.');
+      }, err1 => {
+        console.log("Error " + err1.message);
+    });;
     return "OK";
 }
 
 exports.getUsers = function () {
-    return sqlite.run('SELECT Email, Uloga FROM User');
+    return pool.query('SELECT \"email\", \"uloga\" FROM \"User\"').then(dbResponse=> {
+        console.log('Users successfully retrieved.');
+        console.log(dbResponse);
+      }, err1 => {
+        console.log("Error " + err1.message);
+    });
 }
