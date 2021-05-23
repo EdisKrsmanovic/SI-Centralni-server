@@ -36,15 +36,21 @@ exports.login = function (req, res) {
         res.send(400);
     }
 
-    const user = userService.findUser(email);
-    bcrypt.compare(password, user.Password, function (error, matched) {
-        if (matched) {
-            // Useru ne vraćamo njegov hashirani password
-            user.Password = undefined;
-            res.send({token: createToken(user)});
+    userService.findUser(email, (user) => {
+        if(user) {
+            bcrypt.compare(password, user.password, function (error, matched) {
+                if (matched) {
+                    // Useru ne vraćamo njegov hashirani password
+                    user.password = undefined;
+                    res.send({token: createToken(user)});
+                } else {
+                    res.sendStatus(403);
+                }
+            });
         } else {
-            res.sendStatus(403);
+            res.status(500).send({ message: "Something went wrong while logging in" });
         }
     });
+
 }
 

@@ -2,22 +2,22 @@ const userRepository = require('../repositories/userRepository')
 
 
 
-exports.findUser = function findUser(email) {
-    return userRepository.getUser(email);
+exports.findUser = function findUser(email, cb) {
+    return userRepository.getUser(email, cb);
 }
 
-exports.createUser = function createUser(user) {
-    return userRepository.addUser(user);
+exports.createUser = function createUser(user, cb) {
+    return userRepository.addUser(user, cb);
 }
 
-exports.deleteUser = function deleteUser(email) {
-    return userRepository.removeUser(email);
+exports.deleteUser = function deleteUser(email, cb) {
+    return userRepository.removeUser(email, cb);
 }
 
-exports.editRole = function editRole(info) {
-    return userRepository.updateUser(info);
+exports.editRole = function editRole(info, cb) {
+    return userRepository.updateUser(info, cb);
 }
 
-exports.readUsers = function readUsers() {
-    return userRepository.getUsers();
+exports.readUsers = function readUsers(cb) {
+    return userRepository.getUsers(cb);
 }
