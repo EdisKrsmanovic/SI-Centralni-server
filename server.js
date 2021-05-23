@@ -18,5 +18,5 @@ app.listen(port, () => {
 
 app.use('/user', userRoutes)
 app.use('/auth', authRoutes)
-app.use('/faDefintion', faDefintionRoutes)
+app.use('/faDefinition', faDefintionRoutes)
 

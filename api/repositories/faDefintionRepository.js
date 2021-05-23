@@ -40,7 +40,7 @@ exports.updateFaDefintion = function (faDefinition, cb) {
 }
 
 exports.getFaDefinitions = function (cb) {
-    return pool.query('SELECT \"naziv\", \"geotag\", \"tag\" FROM \"FADefinition\"').then(dbResponse => {
+    return pool.query('SELECT \"id\", \"naziv\", \"geotag\", \"tag\" FROM \"FADefinition\"').then(dbResponse => {
         cb(dbResponse.rows)
     }, err1 => {
         cb("Error")
