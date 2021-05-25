@@ -10,4 +10,6 @@ router.put('/edit', faDefintionController.editFaDefintion);
 
 router.get('/all', faDefintionController.readFaDefintion);
 
+router.get('', faDefintionController.readFaById);
+
 module.exports = router;

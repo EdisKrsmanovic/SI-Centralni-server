@@ -21,3 +21,19 @@ exports.editRole = function editRole(info, cb) {
 exports.readUsers = function readUsers(cb) {
     return userRepository.getUsers(cb);
 }
+
+exports.readUser = function readUser(id, cb) {
+    return userRepository.getUserById(id, cb);
+}
+
+exports.editUser = function editUser(info, cb) {
+    return userRepository.updateUserInfo(info, cb);
+}
+
+exports.editUserEmail = function editUserEmail(info,cb){
+    return userRepository.updateUserEmail(info,cb);
+}
+
+exports.editUserPassword = function editUserPassword(info,cb){
+    return userRepository.updateUserPassword(info,cb);
+}

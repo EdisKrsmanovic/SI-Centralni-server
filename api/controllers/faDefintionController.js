@@ -110,3 +110,26 @@ exports.readFaDefintion = function (req, res) {
         res.status(401).send({message: "Not authorized to perform action."})
     }
 }
+
+exports.readFaById = function (req, res) {
+    const authHeader = req.headers['authorization']
+    const token = authHeader && authHeader.split(' ')[1];
+    const user = decodeToken(token);
+
+    if (user) {
+        faDefintionService.readFaDefinitionById(req.body.id, (response) => {
+            if(response === "Error"){
+                res.status(500).send({ message: "Something went wrong when editing FA definition." });
+            } else {
+                let faDefinitions = response;
+                console.log(faDefinitions);
+                //faDefinitions.map(obj=>{return obj.geotag = obj.geotag.split(',').map(el=> parseFloat(el))});
+
+                res.status(200).send(faDefinitions);
+            }
+        });
+
+    } else {
+        res.status(401).send({message: "Not authorized to perform action."})
+    }
+}

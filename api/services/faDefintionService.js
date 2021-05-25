@@ -16,3 +16,7 @@ exports.editFaDefintion = function editFaDefintion(faDefinition, cb) {
 exports.readFaDefinitions = function readFaDefinitions(cb) {
     return faDefintionRepository.getFaDefinitions(cb);
 }
+
+exports.readFaDefinitionById = function readFaDefinitionById(id, cb) {
+    return faDefintionRepository.getFaDefinitionById(id,cb);
+}

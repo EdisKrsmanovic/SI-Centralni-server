@@ -49,7 +49,7 @@ exports.createUser = function (req, res) {
             }
         });
     } else {
-        res.status(401).json({message: "Users are not authorized to perform action."})
+        res.status(401).json({ message: "Users are not authorized to perform action." })
     }
 }
 
@@ -74,7 +74,7 @@ exports.deleteUser = function (req, res) {
             return res.status(403).send({ message: "Administrator is not allowed to delete his own account." });
         }
     } else {
-        res.status(401).send({message: "Users are not authorized to perform action."})
+        res.status(401).send({ message: "Users are not authorized to perform action." })
     }
 }
 
@@ -94,7 +94,7 @@ exports.assignRole = function (req, res) {
             }
         });
     } else {
-        res.status(401).send({message: "Users are not authorized to perform action."})
+        res.status(401).send({ message: "Users are not authorized to perform action." })
     }
 }
 
@@ -109,6 +109,72 @@ exports.readUsers = function (req, res) {
             res.status(status).send(data);
         });
     } else {
-        res.status(401).send({message: "Users are not authorized to perform action."})
+        res.status(401).send({ message: "Users are not authorized to perform action." })
+    }
+}
+
+//prima id i vraća korisnika sa tim id
+exports.readUser = function (req, res) {
+    const authHeader = req.headers['authorization']
+    const token = authHeader && authHeader.split(' ')[1];
+    user = decodeToken(token);
+    if (user != null) {
+        status = userService.readUser(req.body.id, (user) => {
+            if (user != null) {
+                return res.status(200).send({ user, token: regenerateToken(req.body.token) });
+            } else {
+                return res.status(500).send({ message: "Something went wrong retrieving the user." });
+            }
+        });
+    } else {
+        res.status(401).send({ message: "Invalid token." })
+    }
+}
+
+exports.readMe = function (req, res) {
+    const authHeader = req.headers['authorization']
+    const token = authHeader && authHeader.split(' ')[1];
+    user = decodeToken(token);
+    if (user != null) {
+        return res.status(200).send({ user, token: regenerateToken(req.body.token) });
+    } else {
+        res.status(401).send({ message: "Invalid token." })
+    }
+}
+
+//prima id korisnika koji se updatea i email/password
+exports.updateUser = function (req, res) {
+    const authHeader = req.headers['authorization']
+    const token = authHeader && authHeader.split(' ')[1];
+    user = decodeToken(token);
+    if (user != null) {
+        if (!(typeof req.body.email === 'undefined') && !(typeof req.body.password === 'undefined')) {
+            status = userService.editUser({ "id": req.body.id, "email": req.body.email, "password": req.body.password }, () => {
+                if (status === "OK") {
+                    return res.status(200).send({ token: regenerateToken(req.body.token) });
+                } else {
+                    return res.status(500).send({ message: "Something went wrong when editing the user." });
+                }
+            });
+        }
+        else if (!(typeof req.body.password === 'undefined')) {
+            status = userService.editUserPassword({ "id": req.body.id,  "password": req.body.password }, () => {
+                if (status === "OK") {
+                    return res.status(200).send({ token: regenerateToken(req.body.token) });
+                } else {
+                    return res.status(500).send({ message: "Something went wrong when editing the password." });
+                }
+            });
+        } else if (!(typeof req.body.email === 'undefined')){
+            status = userService.editUserEmail({ "id": req.body.id, "email": req.body.email }, () => {
+                if (status === "OK") {
+                    return res.status(200).send({ token: regenerateToken(req.body.token) });
+                } else {
+                    return res.status(500).send({ message: "Something went wrong when editing the email." });
+                }
+            });
+        }
+    } else {
+        res.status(401).send({ message: "Invalid token." })
     }
 }

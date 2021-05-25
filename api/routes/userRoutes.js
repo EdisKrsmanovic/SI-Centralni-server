@@ -10,4 +10,10 @@ router.put('/assignRole', userController.assignRole);
 
 router.get('/all', userController.readUsers);
 
+router.get('', userController.readUser);
+
+router.get('/me', userController.readMe);
+
+router.post('/update', userController.updateUser);
+
 module.exports = router;

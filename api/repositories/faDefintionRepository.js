@@ -46,3 +46,11 @@ exports.getFaDefinitions = function (cb) {
         cb("Error")
     });
 }
+
+exports.getFaDefinitionById = function (id,cb) {
+    return pool.query('SELECT \"id\", \"naziv\", \"geotag\", \"tag\" FROM \"FADefinition\" WHERE \"id\"=$1',[id]).then(dbResponse => {
+        cb(dbResponse.rows[0])
+    }, err1 => {
+        cb("Error")
+    });
+}

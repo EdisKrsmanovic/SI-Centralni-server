@@ -61,11 +61,67 @@ exports.updateUser = function (info, cb) {
 }
 
 exports.getUsers = function (cb) {
-    return pool.query('SELECT \"email\", \"uloga\" FROM \"User\"').then(dbResponse=> {
+    return pool.query('SELECT \"id\", \"email\", \"uloga\" FROM \"User\"').then(dbResponse=> {
         console.log('Users successfully retrieved.');
         cb(200, dbResponse.rows);
     }, err1 => {
         console.log("Error " + err1.message);
         cb(500, {message: "Users are not authorized to perform action."});
     });
+}
+
+exports.getUserById = function (id, cb) {
+    const user = pool.query('SELECT \"id\", \"email\", \"uloga\" FROM \"User\" WHERE \"id\"=$1', [id]).then(dbResponse => {
+        console.log('User successfully retrieved.');
+        cb(dbResponse.rows[0]);
+      }, err1 => {
+        console.log("Error " + err1.message);
+        cb(null);
+    });
+    return user[0];
+}
+
+exports.updateUserInfo = function (info, cb) {
+    hashedPass = bcrypt.hashSync(info.password, 12, function (err1, hashedPassword) {
+        if(err1){
+            console.log("error1");
+            return "NOT OK";
+        }
+    });
+    pool.query("UPDATE \"User\" SET \"email\"=$1::text,\"password\"=$2::text WHERE \"id\"=$3", [info.email, hashedPass, info.id]).then(dbResponse=> {
+        console.log('User successfully updated.');
+        cb("OK");
+      }, err1 => {
+        console.log("Error " + err1.message);
+        cb("Error");
+    });
+    return "OK";
+}
+
+exports.updateUserEmail = function (info, cb) {
+    pool.query("UPDATE \"User\" SET \"email\"=$1::text WHERE \"id\"=$2", [info.email, info.id]).then(dbResponse=> {
+        console.log('User successfully updated.');
+        cb("OK");
+      }, err1 => {
+        console.log("Error " + err1.message);
+        cb("Error");
+    });
+    return "OK";
+}
+
+exports.updateUserPassword = function (info, cb) {
+    hashedPass = bcrypt.hashSync(info.password, 12, function (err1, hashedPassword) {
+        if(err1){
+            console.log("error1");
+            return "NOT OK";
+        }
+    });
+    pool.query("UPDATE \"User\" SET \"password\"=$1::text WHERE \"id\"=$2", [hashedPass, info.id]).then(dbResponse=> {
+        console.log('User successfully updated.');
+        cb("OK");
+      }, err1 => {
+        console.log("Error " + err1.message);
+        cb("Error");
+    });
+    return "OK";
 }
