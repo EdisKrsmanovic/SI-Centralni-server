@@ -143,11 +143,21 @@ exports.readMe = function (req, res) {
 }
 
 //prima id korisnika koji se updatea i email/password
+//treba refactor ovu funkciju nekad
 exports.updateUser = function (req, res) {
     const authHeader = req.headers['authorization']
     const token = authHeader && authHeader.split(' ')[1];
     user = decodeToken(token);
     if (user != null) {
+        if (!(typeof req.body.uloga === 'undefined')) {
+            status = userService.editRoleById({ "id": req.body.id, "uloga": req.body.uloga }, () => {
+                if (status === "OK") {
+                    console.log("OK");
+                } else {
+                    return res.status(500).send({ message: "Something went wrong when assigning a new role to user." });
+                }
+            });
+        }
         if (!(typeof req.body.email === 'undefined') && !(typeof req.body.password === 'undefined')) {
             status = userService.editUser({ "id": req.body.id, "email": req.body.email, "password": req.body.password }, () => {
                 if (status === "OK") {
@@ -173,6 +183,8 @@ exports.updateUser = function (req, res) {
                     return res.status(500).send({ message: "Something went wrong when editing the email." });
                 }
             });
+        }else{
+            return res.status(200).send({ token: regenerateToken(req.body.token) });
         }
     } else {
         res.status(401).send({ message: "Invalid token." })

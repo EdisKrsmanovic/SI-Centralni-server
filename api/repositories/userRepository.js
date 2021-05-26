@@ -60,6 +60,17 @@ exports.updateUser = function (info, cb) {
     return "OK";
 }
 
+exports.updateUserRoleById = function (info, cb) {
+    pool.query("UPDATE \"User\" SET \"uloga\"=$1::text WHERE \"id\"=$2", [info.uloga, info.id]).then(dbResponse=> {
+        console.log('User successfully updated.');
+        cb("OK");
+      }, err1 => {
+        console.log("Error " + err1.message);
+        cb("Error");
+    });
+    return "OK";
+}
+
 exports.getUsers = function (cb) {
     return pool.query('SELECT \"id\", \"email\", \"uloga\" FROM \"User\"').then(dbResponse=> {
         console.log('Users successfully retrieved.');

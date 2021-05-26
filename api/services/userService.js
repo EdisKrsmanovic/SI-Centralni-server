@@ -37,3 +37,7 @@ exports.editUserEmail = function editUserEmail(info,cb){
 exports.editUserPassword = function editUserPassword(info,cb){
     return userRepository.updateUserPassword(info,cb);
 }
+
+exports.editRoleById = function editRole(info,cb){
+    return userRepository.updateUserRoleById(info,cb);
+}
