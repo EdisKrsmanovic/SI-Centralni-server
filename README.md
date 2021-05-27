@@ -6,7 +6,7 @@ Kao podsjetnik koristiti [prethodni projekat.](https://github.com/EdisKrsmanovic
 
 Korištene tehnologije: 
 - **NodeJS**
-- **SQLite** (zbog lakšeg pokretanja lokalno, inače je pametnije koristiti neki drugi DBMS)
+- **Postgres**
 
 Ovaj repozitorij predstavlja centralni server koji služi da podržava funkcionalnosti PAI (**P**ortal za **a**dministraciju i **i**zvještavanje) aplikacije i FA (**F**eedback **a**plikacija) koji su sastavni dio drugog projekta na predmetu Softverski Inženjering.
 
