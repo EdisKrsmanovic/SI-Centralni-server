@@ -330,7 +330,7 @@ exports.readActiveNotActiveFadevice = function (req, res) {
                 res.status(500).send({ message: "Something went wrong." });
             } else {
                 console.log(response)
-                res.status(200).json({ active: response.active, notactive: response.notactive });
+                res.status(200).json({ aktivni: response.active, neaktivni: response.notactive });
             }
         });
 
