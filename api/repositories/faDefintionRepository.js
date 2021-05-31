@@ -1,6 +1,5 @@
-const sqlite = require('sqlite-sync');
+
 const bcrypt = require("bcrypt");
-sqlite.connect('baza.db')
 const pg = require('pg');
 const pool = new pg.Pool({
         user: process.env.DB_USER,
@@ -9,7 +8,10 @@ const pool = new pg.Pool({
         password: process.env.DB_PASSWORD,
         port: process.env.DB_PORT,
         ssl: {rejectUnauthorized: false}
+
+
     }
+      
 );
 
 exports.addFaDefintion = function (faDefintion, cb) {
@@ -54,3 +56,5 @@ exports.getFaDefinitionById = function (id,cb) {
         cb("Error")
     });
 }
+
+module.exports = { pool }
