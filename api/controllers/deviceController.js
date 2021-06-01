@@ -112,9 +112,9 @@ exports.getResponses = async function getResponses(req, res) {
 
             let resultJson = {};
             resultJson.QuestionText = result.questiontext;
-            if(result.CustomAnswer == null)
+            if(result.customanswer == null)
             resultJson.AnswerText = result.answertext;
-            else resultJson.AnswerText = result.CustomAnswer;
+            else resultJson.AnswerText = result.customanswer;
             resultJson.DeviceId = result.deviceid;
             resultJson.DeviceName = result.devicename;
             resultJson.Date = result.date;
