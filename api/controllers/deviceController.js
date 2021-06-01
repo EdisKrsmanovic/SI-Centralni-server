@@ -313,3 +313,36 @@ exports.countResponses = async function countResponses(req,res){
 
 }
 
+const updateDevice = `Update FADevice 
+set campaignid = $1,devicename = $2,installationcode = $3 ,geotag = $4, tag = $5
+where deviceid = $6`;
+exports.editDevice = async function editDevice(req,res){
+
+    const {CampaignId,DeviceName,InstalaltionCode,GeoTag,Tag,DeviceId} = req.body;
+
+    if(CampaignId == null ||DeviceName == null ||InstalaltionCode == null ||GeoTag == null || Tag == null ||DeviceId == null){
+        res.status(404);
+        const error = new Error(4, "Invalid json format.");
+        res.send(error);
+        return;
+    }
+
+    try{
+
+       const updateRes = db.pool.query(updateDevice,[CampaignId,DeviceName,InstalaltionCode,,GeoTag,Tag,DeviceId]);
+       res.status(200);
+       res.send({success:true});
+
+    }catch(err){
+
+        console.log(err);
+        res.status(400);
+        res.send({
+            error: err
+        });
+        return;
+
+    }
+
+
+}
