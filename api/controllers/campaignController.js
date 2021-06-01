@@ -64,7 +64,6 @@ exports.getCampaignById = async function getCampaign(req, res) {
         const devices = [];
 
         const devicesRes =await db.pool.query(selectDevices,[campaign_id]);
-        console.log("Got "+ devicesRes.rowCount);
 
         for(let i = 0 ; i<  devicesRes.rowCount;i++){
             const device = devicesRes.rows[i];
@@ -91,7 +90,7 @@ exports.getCampaignById = async function getCampaign(req, res) {
  */
 const insertCampaign = "Insert into campaign(Name,StartDate,EndDate) values ($1,To_Date($2, 'dd-mm-yyyy'),To_Date($3, 'dd-mm-yyyy')) Returning *";
 const insertQuestion = "Insert into question(QuestionType,QuestionText,IsDependent,Data1,Data2,Data3,CampaignId) values($1,$2,$3,$4,$5,$6,$7) Returning *";
-const insertAnswer = "Insert into answer(answertext,isimage) values ($1,$2) Returning *";
+const insertAnswer = "Insert into answer(answertext,isimage,base64) values ($1,$2,$3) Returning *";
 const insertQuestionAnswer = "Insert into question_answer(questionid,answerid) values ($1,$2)";
 const updateDevice  ="Update FADevice set campaignid = $1 where deviceid=$2";
 exports.createCampaign = async function createCampaign(req, res) {
@@ -139,7 +138,7 @@ exports.createCampaign = async function createCampaign(req, res) {
                                 for (let i = 0; i < Answers.length; i++) {
                                     let answer = Answers[i];
                                     try {
-                                        const insertRes = await db.pool.query(insertAnswer, [answer.AnswerText, answer.IsAPicture], async function(err, result, fields) {
+                                        const insertRes = await db.pool.query(insertAnswer, [answer.AnswerText, answer.IsAPicture,answer.Base64], async function(err, result, fields) {
                                             if (!err) {
                                                 const AnswerId = result.rows[0].answerid;
                                                 const insertRes = await db.pool.query(insertQuestionAnswer, [QuestionId, AnswerId]);

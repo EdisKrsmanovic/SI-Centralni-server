@@ -33,7 +33,6 @@ exports.saveResponse = async function saveResponse(req, res) {
     const responses = req.body.UserResponses;
     const deviceid = req.body.DeviceId;
     if (responses == null) {
-        console.log("GOT WRONG\n " + JSON.stringify(req.body));
         res.status(404);
         const error = new Error(4, "Invalid json format.");
         res.send(error);
@@ -88,7 +87,6 @@ exports.getResponses = async function getResponses(req, res) {
 
     if(CampaignId==null){
         if (responses == null) {
-            console.log("GOT WRONG\n " + JSON.stringify(req.body));
             res.status(404);
             const error = new Error(4, "Invalid json format.");
             res.send(error);
@@ -164,6 +162,29 @@ exports.addDependent = async function addDependent(req, res) {
 
 }
 
+const removeDeviceDependent = "Update fadevice set dependentquestionid = null where deviceid = $1";
+exports.removeDependent = async function removeDependent(req, res) {
+
+    const {DeviceId} =req.body;
+    
+    try{
+
+        const updateRes = db.pool.query(removeDeviceDependent,[DeviceId]);
+
+        res.status(200);
+        res.send({success:true});
+
+    }catch(err){
+        console.log(err);
+        res.status(400);
+        res.send({
+            error: err
+        });
+
+    }
+
+
+}
 
 const selectDevicedependent = "Select dependentquestionid from fadevice where deviceid = $1";
 const selectQuestion = "Select * From  Question q Where q.QuestionId = $1";

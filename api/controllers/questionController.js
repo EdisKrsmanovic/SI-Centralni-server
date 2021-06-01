@@ -88,11 +88,11 @@ exports.deleteQuestion = async function deleteQuestion(req, res) {
      * CREATE Question
      */
 const insertQuestion = "Insert into question(QuestionType,QuestionText,IsDependent,Data1,Data2,Data3,CampaignId) values($1,$2,$3,$4,$5,$6,$7) Returning *";
-const insertAnswer = "Insert into answer(answertext,isimage) values ($1,$2) Returning *";
+const insertAnswer = "Insert into answer(answertext,isimage,base64) values ($1,$2,$3) Returning *";
 const insertQuestionAnswer = "Insert into question_answer(questionid,answerid) values ($1,$2)";
 exports.addQuestion = async function addQuestion(req, res) {
 
-    const {
+    let {
         CampaignId,
         QuestionType,
         QuestionText,
@@ -103,12 +103,13 @@ exports.addQuestion = async function addQuestion(req, res) {
         Answers
     } = req.body;
 
-    if (CampaignId == null || QuestionType == null || QuestionText == null || IsDependent == null || (QuestionType !== "Text" && Answers == null)) {
+    if ((CampaignId == null && IsDependent == false)|| QuestionType == null || QuestionText == null || IsDependent == null || (QuestionType !== "Text" && Answers == null)) {
         res.status(404);
         const error = new Error(0, "Bad json format.");
         res.send(error);
         return;
     }
+    if(IsDependent == true)CampaignId=null;
     let QuestionId = null;
     try {
         const insertRes = await db.pool.query(insertQuestion, [QuestionType, QuestionText, IsDependent, Data1, Data2, Data3, CampaignId]);
@@ -118,7 +119,7 @@ exports.addQuestion = async function addQuestion(req, res) {
         } else {
             for (let i = 0; i < Answers.length; i++) {
                 let answer = Answers[i];
-                const insertRes = await db.pool.query(insertAnswer, [answer.AnswerText, answer.IsAPicture]);
+                const insertRes = await db.pool.query(insertAnswer, [answer.AnswerText, answer.IsAPicture,answer.Base64]);
                 const AnswerId = insertRes.rows[0].answerid;
                 const insertResAns = await db.pool.query(insertQuestionAnswer, [QuestionId, AnswerId]);
             }
@@ -156,6 +157,7 @@ exports.getAnswersByQuestionId = async function getAnswers(req, res) {
             const answerJson = {};
             answerJson.AnswerText = answer.answertext;
             answerJson.IsAPicture = answer.isimage;
+            answerJson.Base64 = answer.base64;
             returnJson.push(answerJson);
         }
         res.status(200);
@@ -165,4 +167,56 @@ exports.getAnswersByQuestionId = async function getAnswers(req, res) {
         const error = new Error(0, "Unknown server error");
         res.send(error);
     }
+}
+
+const selectDependet = "Select * from question where campaignid is null";
+exports.getDependentQuestions = async function getDependentQuestions(req,res){
+
+    const returnJSON = [];
+    try{
+
+
+        const selectQuestion =await db.pool.query(selectDependet,[]);
+
+        for(let i = 0 ; i < selectQuestion.rowCount;i++){
+
+            const question = selectQuestion.rows[i];
+            let questionJSON = {};
+            questionJSON.QuestionId = question.questionid;
+            questionJSON.QuestionType = question.questiontype;
+            questionJSON.QuestionText = question.questiontext;
+            questionJSON.Data1 = question.data1;
+            questionJSON.Data2 = question.data2;
+            questionJSON.Data3 = question.data3;
+            questionJSON.IsDependent = question.isdependent;
+
+            
+
+            const selectAnswer = await db.pool.query(selectAnswers, [questionJSON.QuestionId]);
+            const answersJSON = [];
+            for (let i = 0; i < selectAnswer.rowCount; i++) {
+                const answer = selectAnswer.rows[i];
+                const answerJson = {};
+                answerJson.AnswerText = answer.answertext;
+                answerJson.IsAPicture = answer.isimage;
+                answerJson.Base64 = answer.base64;
+                answersJSON.push(answerJson);
+            }
+
+            questionJSON.QuestionAnswers = answersJSON;
+
+            returnJSON.push(questionJSON);  
+
+        }
+
+        res.status(200);
+        res.send(returnJSON);
+
+    }catch(err){
+        console.log(err);
+        res.status(500);
+        const error = new Error(0, "Unknown server error");
+        res.send(error);
+    }
+
 }

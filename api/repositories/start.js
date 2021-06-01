@@ -58,10 +58,12 @@ CREATE TABLE
 	FADevice
 (
 	DeviceID SERIAL NOT NULL
-	, CampaignID INT NOT NULL
+	, CampaignID INT
     , DeviceName VARCHAR(300) NULL
 	, InstallationCode VARCHAR(300) NULL
     , DependentQuestionID INT NULL
+    , GeoTag text NOT NULL
+    , Tag text NOT NULL
 ,
 CONSTRAINT Pk_FADevice_DeviceID PRIMARY KEY
 (
@@ -80,7 +82,7 @@ CREATE TABLE
 	, Data3 TEXT NULL
 	, QuestionText TEXT NOT NULL
 	, IsDependent BOOLEAN NOT NULL
-	, CampaignID INT NOT NULL
+	, CampaignID INT
 ,
 CONSTRAINT Pk_Question_QuestionID PRIMARY KEY
 (
@@ -214,11 +216,23 @@ module.exports.fillDB = async function fillDB() {
 
 
     INSERT INTO Campaign (name, startdate, enddate) VALUES ( 'Zadovoljstvo korisnika sa našim proizvodima', To_Date('21-05-2021', 'dd-mm-yyyy'), To_Date('21-05-2021', 'dd-mm-yyyy'));
-    INSERT INTO FADevice ( DeviceName, CampaignID, InstallationCode) VALUES ('grupa1', 1, 'spaha1');
-    INSERT INTO FADevice ( DeviceName, CampaignID, InstallationCode) VALUES ('grupa2', 1, 'spaha2');
+   -- INSERT INTO FADevice ( DeviceName, CampaignID, InstallationCode) VALUES ('grupa1', 1, 'spaha1');
+   --INSERT INTO FADevice ( DeviceName, CampaignID, InstallationCode) VALUES ('grupa2', 1, 'spaha2');
 
     INSERT INTO Campaign (name, startdate, enddate) VALUES ( 'Pitanja o namirnicama', To_Date('01-03-2021', 'dd-mm-yyyy'), To_Date('18-08-2021', 'dd-mm-yyyy'));
-    INSERT INTO FADevice ( DeviceName, CampaignID, InstallationCode) VALUES ('grupa3', 1, 'spaha3');
+    --INSERT INTO FADevice ( DeviceName, CampaignID, InstallationCode) VALUES ('grupa3', 1, 'spaha3');
+
+    INSERT INTO FADevice ( DeviceName, geotag, tag,CampaignID,InstallationCode) VALUES
+    ('Samsung Tablet', '43.324378463072996,17.804511631732556', 'Mostar',1,'spaha1');
+
+    INSERT INTO FADevice ( DeviceName, geotag, tag,CampaignID,InstallationCode) VALUES
+    ('Lenovo Tablet', '43.84838888369753,18.376520907999858', 'hrasno',2,'spaha2');
+
+    INSERT INTO FADevice ( DeviceName, geotag, tag) VALUES
+    ('Sony Tablet', '44.1209160564588,18.097857374987143', 'Test3 tag');
+
+    INSERT INTO FADevice ( DeviceName, geotag, tag) VALUES
+    ('Xiaomi', '43.85537342499372,18.40814328393261', 'SCC Centar');
 
     Insert into Answer(AnswerId,AnswerText,IsImage) values (-1,' ',false);
     
