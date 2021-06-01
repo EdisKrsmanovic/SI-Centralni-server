@@ -1,4 +1,5 @@
-const db = require('./faDefintionRepository');
+const rep = require('../repositories/faDefintionRepository');
+const db = rep.pool;
 
 // runs on server start
 

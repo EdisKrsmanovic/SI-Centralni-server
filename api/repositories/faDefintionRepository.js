@@ -59,4 +59,4 @@ exports.getFaDefinitionById = function (id,cb) {
     });
 }
 
-module.exports = { pool }
+exports.pool = { pool }

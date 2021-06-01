@@ -1,4 +1,5 @@
-const db = require('../repositories/faDefintionRepository');
+const rep = require('../repositories/faDefintionRepository');
+const db = rep.pool;
 const Error = require('../models/error.js');
 
 const getAnswer = "Select * from answer WHERE answerid = $1";
