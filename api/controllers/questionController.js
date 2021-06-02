@@ -196,12 +196,21 @@ exports.getDependentQuestions = async function getDependentQuestions(req,res){
             const selectAnswer = await db.pool.query(selectAnswers, [questionJSON.QuestionId]);
             const answersJSON = [];
             for (let i = 0; i < selectAnswer.rowCount; i++) {
+               
+
                 const answer = selectAnswer.rows[i];
                 const answerJson = {};
                 answerJson.AnswerText = answer.answertext;
                 answerJson.IsAPicture = answer.isimage;
                 answerJson.Base64 = answer.base64;
-                answersJSON.push(answerJson);
+
+                const questionsAnswer ={};
+                questionsAnswer.QuestionId = question.questionid;
+                questionsAnswer.AnswerId = answer.answerid;
+
+                questionsAnswer.Answer = answerJson;
+            
+                answersJSON.push(questionsAnswer);
             }
 
             questionJSON.QuestionAnswers = answersJSON;
