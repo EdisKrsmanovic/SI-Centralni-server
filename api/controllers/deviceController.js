@@ -1,4 +1,5 @@
-const db = require('../repositories/faDefintionRepository');
+const rep = require('../repositories/faDefintionRepository');
+const db = rep.pool;
 const Error = require('../models/error.js');
 
 exports.activateDevice = async function activateDevice(req, res) {
@@ -33,7 +34,6 @@ exports.saveResponse = async function saveResponse(req, res) {
     const responses = req.body.UserResponses;
     const deviceid = req.body.DeviceId;
     if (responses == null) {
-        console.log("GOT WRONG\n " + JSON.stringify(req.body));
         res.status(404);
         const error = new Error(4, "Invalid json format.");
         res.send(error);
@@ -88,7 +88,6 @@ exports.getResponses = async function getResponses(req, res) {
 
     if(CampaignId==null){
         if (responses == null) {
-            console.log("GOT WRONG\n " + JSON.stringify(req.body));
             res.status(404);
             const error = new Error(4, "Invalid json format.");
             res.send(error);
@@ -113,9 +112,9 @@ exports.getResponses = async function getResponses(req, res) {
 
             let resultJson = {};
             resultJson.QuestionText = result.questiontext;
-            if(result.CustomAnswer == null)
+            if(result.customanswer == null)
             resultJson.AnswerText = result.answertext;
-            else resultJson.AnswerText = result.CustomAnswer;
+            else resultJson.AnswerText = result.customanswer;
             resultJson.DeviceId = result.deviceid;
             resultJson.DeviceName = result.devicename;
             resultJson.Date = result.date;
@@ -164,6 +163,29 @@ exports.addDependent = async function addDependent(req, res) {
 
 }
 
+const removeDeviceDependent = "Update fadevice set dependentquestionid = null where deviceid = $1";
+exports.removeDependent = async function removeDependent(req, res) {
+
+    const {DeviceId} =req.body;
+    
+    try{
+
+        const updateRes = db.pool.query(removeDeviceDependent,[DeviceId]);
+
+        res.status(200);
+        res.send({success:true});
+
+    }catch(err){
+        console.log(err);
+        res.status(400);
+        res.send({
+            error: err
+        });
+
+    }
+
+
+}
 
 const selectDevicedependent = "Select dependentquestionid from fadevice where deviceid = $1";
 const selectQuestion = "Select * From  Question q Where q.QuestionId = $1";
@@ -292,3 +314,36 @@ exports.countResponses = async function countResponses(req,res){
 
 }
 
+const updateDevice = `Update FADevice 
+set campaignid = $1,devicename = $2,installationcode = $3 ,geotag = $4, tag = $5
+where deviceid = $6`;
+exports.editDevice = async function editDevice(req,res){
+
+    const {CampaignId,DeviceName,InstalaltionCode,GeoTag,Tag,DeviceId} = req.body;
+
+    if(CampaignId == null ||DeviceName == null ||InstalaltionCode == null ||GeoTag == null || Tag == null ||DeviceId == null){
+        res.status(404);
+        const error = new Error(4, "Invalid json format.");
+        res.send(error);
+        return;
+    }
+
+    try{
+
+       const updateRes = db.pool.query(updateDevice,[CampaignId,DeviceName,InstalaltionCode,,GeoTag,Tag,DeviceId]);
+       res.status(200);
+       res.send({success:true});
+
+    }catch(err){
+
+        console.log(err);
+        res.status(400);
+        res.send({
+            error: err
+        });
+        return;
+
+    }
+
+
+}

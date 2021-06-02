@@ -10,6 +10,8 @@ const pool = new pg.Pool({
         ssl: {rejectUnauthorized: false}
 
 
+
+
     }
       
 );
@@ -57,4 +59,4 @@ exports.getFaDefinitionById = function (id,cb) {
     });
 }
 
-module.exports = { pool }
+exports.pool = { pool }

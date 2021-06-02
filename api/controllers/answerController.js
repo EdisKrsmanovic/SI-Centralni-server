@@ -1,4 +1,5 @@
-const db = require('../repositories/faDefintionRepository');
+const rep = require('../repositories/faDefintionRepository');
+const db = rep.pool;
 const Error = require('../models/error.js');
 
 const getAnswer = "Select * from answer WHERE answerid = $1";
@@ -48,10 +49,10 @@ exports.createAnswer = async function addAnswer(req, res) {
             res.send(error);
             return;
         }
-        const insertAnswer = "Insert into answer(answertext,isimage) values ($1,$2,$3) Returning *";
+        const insertAnswer = "Insert into answer(answertext,isimage,base64) values ($1,$2,$3) Returning *";
         const insertQuestionAnswer = "Insert into question_answer(questionid,answerid) values ($1,$2)";
         try {
-            const insertRes = await db.pool.query(insertAnswer, [Answer.AnswerText, Answer.IsAPicture, Answer.Base64]);
+            const insertRes = await db.pool.query(insertAnswer, [Answer.AnswerText, Answer.IsAPicture,Answer.Base64]);
             const AnswerId = insertRes.rows[0].answerid;
             const insertRes2 = await db.pool.query(insertQuestionAnswer, [QuestionId, AnswerId]);
             res.status(200);
@@ -60,12 +61,17 @@ exports.createAnswer = async function addAnswer(req, res) {
                 AnswerId: insertRes.rows[0].answerid
             });
         } catch (err) {
+            console.log(err);
             res.status(500);
             const error = new Error(0, "Unknown server error.");
             res.send(error);
             return;
         }
     }
+
+
+
+    
     /**
      * DELETE ANSWER BY ID
      */

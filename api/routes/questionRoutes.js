@@ -6,5 +6,6 @@ router.post('/', questionController.addQuestion);
 router.delete('/:id', questionController.deleteQuestion);
 router.put('/:id', questionController.editQuestion);
 router.get('/:id/answers', questionController.getAnswersByQuestionId);
+router.get('/dependents', questionController.getDependentQuestions);
 
 module.exports = router;
