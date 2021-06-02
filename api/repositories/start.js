@@ -113,6 +113,7 @@ CREATE TABLE
 	, CustomAnswer TEXT NULL
 	, QuestionID INT NOT NULL
 	, AnswerID INT
+    , Duration INT
     , DeviceID INT NOT NULL
     , Date Date Default Current_Timestamp
 ,
@@ -279,11 +280,14 @@ module.exports.fillDB = async function fillDB() {
 
 
 
-    Insert into Answer(AnswerText,IsImage) values ('<18',false); --14
-    Insert into Answer(AnswerText,IsImage) values ('18-25',false); --15
-    Insert into Answer(AnswerText,IsImage) values ('26-40',false); --16
-    Insert into Answer(AnswerText,IsImage) values ('41-65',false); --17
-    Insert into Answer(AnswerText,IsImage) values ('>66',false); --18
+    Insert into Answer(AnswerText,IsImage) values ('Kola orginal',false); --32
+    Insert into Answer(AnswerText,IsImage) values ('Kola zero',false); --33
+    Insert into Answer(AnswerText,IsImage) values ('Kola sa limunom',false); --34
+
+    Insert into Answer(AnswerText,IsImage) values ('Da',false); --35
+    Insert into Answer(AnswerText,IsImage) values ('Ne',false); --36
+
+    Insert into Answer(AnswerText,IsImage) values ('10',false); --37
 
 
 
@@ -302,6 +306,11 @@ module.exports.fillDB = async function fillDB() {
    Insert into Question(QuestionType,QuestionText,IsDependent,Data1,Data2,Data3,CampaignID) values('Multiple','Koja alkoholna pića konzumirate?',false,null,null,null,1);--11
    Insert into Question(QuestionType,QuestionText,IsDependent,Data1,Data2,Data3,CampaignID) values('Text','Koliko cesto idete u nabavku?',false,null,null,null,1);--12
 
+   Insert into Question(QuestionType,QuestionText,IsDependent,Data1,Data2,Data3) values('Multiple','Koju vrstu kole pijete',true,null,null,null);--13
+
+   Insert into Question(QuestionType,QuestionText,IsDependent,Data1,Data2,Data3) values('Single','Da li cesto kupujete domace proizvode',true,null,null,null);--14
+
+   Insert into Question(QuestionType,QuestionText,IsDependent,Data1,Data2,Data3) values('Single','Koliko ste zavodoljni sa nasim mlijecnim porizvodima',true,null,null,null);--15
 
 
    Insert into Question_Answer(QuestionID,AnswerID) values(1,1);
@@ -338,17 +347,23 @@ module.exports.fillDB = async function fillDB() {
    Insert into Question_Answer(QuestionID,AnswerID) values(11,30);
    Insert into Question_Answer(QuestionID,AnswerID) values(11,31);
 
+   Insert into Question_Answer(QuestionID,AnswerID) values(13,32);
+   Insert into Question_Answer(QuestionID,AnswerID) values(13,33);
+   Insert into Question_Answer(QuestionID,AnswerID) values(13,34);
 
-   
+   Insert into Question_Answer(QuestionID,AnswerID) values(14,35);
+   Insert into Question_Answer(QuestionID,AnswerID) values(14,36);
+
+   Insert into Question_Answer(QuestionID,AnswerID) values(15,37);
 
 
 
-  -- Insert into UserResponse(QuestionID,AnswerID,CustomAnswer,DeviceID) values(3,4,null,1);
-  -- Insert into UserResponse(QuestionID,AnswerID,CustomAnswer,DeviceID) values(3,4,null,2);
-  -- Insert into UserResponse(QuestionID,AnswerID,CustomAnswer,DeviceID) values(3,5,null,1);
+  --Insert into UserResponse(QuestionID,AnswerID,CustomAnswer,DeviceID) values(3,4,null,1);
+  --Insert into UserResponse(QuestionID,AnswerID,CustomAnswer,DeviceID) values(3,4,null,2);
+  --Insert into UserResponse(QuestionID,AnswerID,CustomAnswer,DeviceID) values(3,5,null,1);
   --Insert into UserResponse(QuestionID,AnswerID,CustomAnswer,DeviceID) values(3,5,null,2);
   --Insert into UserResponse(QuestionID,AnswerID,CustomAnswer,DeviceID) values(3,6,null,1);
-  -- Insert into UserResponse(QuestionID,AnswerID,CustomAnswer,DeviceID) values(3,6,null,2);
+  --Insert into UserResponse(QuestionID,AnswerID,CustomAnswer,DeviceID) values(3,6,null,2);
 
     `;
 

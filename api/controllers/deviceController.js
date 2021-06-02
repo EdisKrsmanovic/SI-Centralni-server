@@ -29,10 +29,11 @@ exports.activateDevice = async function activateDevice(req, res) {
     }
 }
 
-const insertResponse = " Insert into UserResponse(QuestionID,AnswerID,CustomAnswer,DeviceId) values($1,$2,$3,$4)";
+const insertResponse = " Insert into UserResponse(QuestionID,AnswerID,CustomAnswer,DeviceId,Duration) values($1,$2,$3,$4,$5)";
 exports.saveResponse = async function saveResponse(req, res) {
     const responses = req.body.UserResponses;
     const deviceid = req.body.DeviceId;
+    const duration = req.body.Duration;
     if (responses == null) {
         res.status(404);
         const error = new Error(4, "Invalid json format.");
@@ -43,7 +44,7 @@ exports.saveResponse = async function saveResponse(req, res) {
         let response = responses[i];
         if(response.AnswerId == -1)response.AnswerId=null;
         try {
-            const insertRes = await db.pool.query(insertResponse, [response.QuestionId, response.AnswerId, response.CustomAnswer,deviceid]);
+            const insertRes = await db.pool.query(insertResponse, [response.QuestionId, response.AnswerId, response.CustomAnswer,deviceid,duration]);
         } catch (err) {
             res.status(400);
             res.send({
