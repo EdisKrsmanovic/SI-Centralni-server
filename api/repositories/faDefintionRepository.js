@@ -10,8 +10,8 @@ const pool = new pg.Pool({
         ssl: {rejectUnauthorized: false}
 
 
-        
-    /*  Ignore this, i need it J.D.
+    /*    
+     // Ignore this, i need it J.D.
       user: 'postgres',
     host: '127.0.0.1',
     database: 'SI-DB',

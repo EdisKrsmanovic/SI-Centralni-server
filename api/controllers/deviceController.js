@@ -8,6 +8,7 @@ const fadeviceService = require('../services/deviceService')
 exports.activateDevice = async function activateDevice(req, res) {
     const installation_code = req.params.code;
     const selectDevice = "Select fa.DeviceName, fa.DeviceId, fa.CampaignID from FADevice fa where fa.InstallationCode = $1";
+    const updateDevice = "Update FADevice set installationcode = null where InstallationCode = $1";
     try {
         const selectRes = await db.pool.query(selectDevice, [installation_code]);
         if (selectRes.rowCount === 0) {
@@ -16,6 +17,7 @@ exports.activateDevice = async function activateDevice(req, res) {
             res.send(error);
             return;
         }
+        const updateRes = await db.pool.query(updateDevice,[installation_code]);
         const response = {
             Name: selectRes.rows[0].devicename,
             DeviceId: selectRes.rows[0].deviceid,
@@ -25,6 +27,7 @@ exports.activateDevice = async function activateDevice(req, res) {
         res.status(200);
         res.send(response);
     } catch (err) {
+        console.log(err);
         res.status(500);
         const error = new Error(0, "Unknown server error");
         res.send(error);

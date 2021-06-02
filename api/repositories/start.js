@@ -131,7 +131,7 @@ CONSTRAINT Pk_UserResponse_ResponseID PRIMARY KEY
 
 -- Relationship Fk_Campaign_FADevice_CampaignID
 ALTER TABLE FADevice
-ADD CONSTRAINT Fk_Campaign_FADevice_CampaignID FOREIGN KEY (CampaignID) REFERENCES Campaign (CampaignID) ON DELETE CASCADE;
+ADD CONSTRAINT Fk_Campaign_FADevice_CampaignID FOREIGN KEY (CampaignID) REFERENCES Campaign (CampaignID) ON DELETE SET NULL;
 
 
 -- Relationship Fk_Campaign_Question_CampaignID
@@ -218,17 +218,26 @@ module.exports.fillDB = async function fillDB() {
 
 
     INSERT INTO Campaign (name, startdate, enddate) VALUES ( 'Zadovoljstvo korisnika sa našim proizvodima', To_Date('21-05-2021', 'dd-mm-yyyy'), To_Date('21-05-2021', 'dd-mm-yyyy'));
-   -- INSERT INTO FADevice ( DeviceName, CampaignID, InstallationCode) VALUES ('grupa1', 1, 'spaha1');
-   --INSERT INTO FADevice ( DeviceName, CampaignID, InstallationCode) VALUES ('grupa2', 1, 'spaha2');
 
     INSERT INTO Campaign (name, startdate, enddate) VALUES ( 'Pitanja o namirnicama', To_Date('01-03-2021', 'dd-mm-yyyy'), To_Date('18-08-2021', 'dd-mm-yyyy'));
-    --INSERT INTO FADevice ( DeviceName, CampaignID, InstallationCode) VALUES ('grupa3', 1, 'spaha3');
 
     INSERT INTO FADevice ( DeviceName, geotag, tag,CampaignID,InstallationCode) VALUES
     ('Samsung Tablet', '43.324378463072996,17.804511631732556', 'Mostar',1,'spaha1');
 
     INSERT INTO FADevice ( DeviceName, geotag, tag,CampaignID,InstallationCode) VALUES
+    ('Samsung Tablet2', '43.324378463072996,17.804511631732556', 'Mostar',1,'spaha3');
+
+    INSERT INTO FADevice ( DeviceName, geotag, tag,CampaignID,InstallationCode) VALUES
+    ('Samsung Tablet3', '43.324378463072996,17.804511631732556', 'Mostar',1,'spaha5');
+
+    INSERT INTO FADevice ( DeviceName, geotag, tag,CampaignID,InstallationCode) VALUES
     ('Lenovo Tablet', '43.84838888369753,18.376520907999858', 'hrasno',2,'spaha2');
+
+    INSERT INTO FADevice ( DeviceName, geotag, tag,CampaignID,InstallationCode) VALUES
+    ('Lenovo Tablet2', '43.84838888369753,18.376520907999858', 'hrasno',2,'spaha4');
+
+    INSERT INTO FADevice ( DeviceName, geotag, tag,CampaignID,InstallationCode) VALUES
+    ('Lenovo Tablet3', '43.84838888369753,18.376520907999858', 'hrasno',2,'spaha6');
 
     INSERT INTO FADevice ( DeviceName, geotag, tag) VALUES
     ('Sony Tablet', '44.1209160564588,18.097857374987143', 'Test3 tag');
