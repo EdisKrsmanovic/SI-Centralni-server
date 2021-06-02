@@ -28,6 +28,18 @@ app.use('/api/question', questionRoutes);
 app.use('/api/answer', answerRoutes);
 app.use('/api/device', deviceRoutes);
 
+app.get('/api/database/reset', (req, res) => {
+    DBStartHelper.resetDB().then(() => {
+        DBStartHelper.createDB().then(() => {
+            DBStartHelper.fillDB().then(() => {
+                res.send("DB RESET"); 
+            });
+        });
+    });
+    
+    
+    });
+
 port = process.env.PORT || 3000;
 
 
