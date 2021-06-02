@@ -42,9 +42,9 @@ exports.saveResponse = async function saveResponse(req, res) {
     }
     for (let i = 0; i < responses.length; i++) {
         let response = responses[i];
-        if(response.AnswerId == -1)response.AnswerId=null;
+        if (response.AnswerId == -1) response.AnswerId = null;
         try {
-            const insertRes = await db.pool.query(insertResponse, [response.QuestionId, response.AnswerId, response.CustomAnswer,deviceid,duration]);
+            const insertRes = await db.pool.query(insertResponse, [response.QuestionId, response.AnswerId, response.CustomAnswer, deviceid, duration]);
         } catch (err) {
             res.status(400);
             res.send({
@@ -85,9 +85,9 @@ where q.questionid = ur.questionid and ur.answerid is null and ur.deviceid = fa.
 `
 exports.getResponses = async function getResponses(req, res) {
 
-    const {CampaignId,DeviceId} = req.body;
+    const { CampaignId, DeviceId } = req.body;
 
-    if(CampaignId==null){
+    if (CampaignId == null) {
         if (responses == null) {
             res.status(404);
             const error = new Error(4, "Invalid json format.");
@@ -98,23 +98,23 @@ exports.getResponses = async function getResponses(req, res) {
 
     let returnJson = [];
 
-    try{
+    try {
 
         let selectRes = null;
 
-        if(DeviceId==null)
-           selectRes = await db.pool.query(selectResponsesFull,[CampaignId,CampaignId]);
-        else 
-        selectRes = await db.pool.query(selectResponsesDevice,[DeviceId,DeviceId]);
+        if (DeviceId == null)
+            selectRes = await db.pool.query(selectResponsesFull, [CampaignId, CampaignId]);
+        else
+            selectRes = await db.pool.query(selectResponsesDevice, [DeviceId, DeviceId]);
 
-        for(let i = 0 ; i < selectRes.rowCount ; i++){
+        for (let i = 0; i < selectRes.rowCount; i++) {
 
             const result = selectRes.rows[i];
 
             let resultJson = {};
             resultJson.QuestionText = result.questiontext;
-            if(result.customanswer == null)
-            resultJson.AnswerText = result.answertext;
+            if (result.customanswer == null)
+                resultJson.AnswerText = result.answertext;
             else resultJson.AnswerText = result.customanswer;
             resultJson.DeviceId = result.deviceid;
             resultJson.DeviceName = result.devicename;
@@ -129,7 +129,7 @@ exports.getResponses = async function getResponses(req, res) {
 
 
 
-    }catch(err){
+    } catch (err) {
         console.log(err);
         res.status(400);
         res.send({
@@ -143,16 +143,16 @@ exports.getResponses = async function getResponses(req, res) {
 const updateDeviceDependent = "Update fadevice set dependentquestionid = $1 where deviceid = $2";
 exports.addDependent = async function addDependent(req, res) {
 
-    const {QuestionId,DeviceId} =req.body;
-    
-    try{
+    const { QuestionId, DeviceId } = req.body;
 
-        const updateRes = db.pool.query(updateDeviceDependent,[QuestionId,DeviceId]);
+    try {
+
+        const updateRes = db.pool.query(updateDeviceDependent, [QuestionId, DeviceId]);
 
         res.status(200);
-        res.send({success:true});
+        res.send({ success: true });
 
-    }catch(err){
+    } catch (err) {
         console.log(err);
         res.status(400);
         res.send({
@@ -167,16 +167,16 @@ exports.addDependent = async function addDependent(req, res) {
 const removeDeviceDependent = "Update fadevice set dependentquestionid = null where deviceid = $1";
 exports.removeDependent = async function removeDependent(req, res) {
 
-    const {DeviceId} =req.body;
-    
-    try{
+    const { DeviceId } = req.body;
 
-        const updateRes = db.pool.query(removeDeviceDependent,[DeviceId]);
+    try {
+
+        const updateRes = db.pool.query(removeDeviceDependent, [DeviceId]);
 
         res.status(200);
-        res.send({success:true});
+        res.send({ success: true });
 
-    }catch(err){
+    } catch (err) {
         console.log(err);
         res.status(400);
         res.send({
@@ -195,24 +195,24 @@ const selectAnswers = "Select a.* from Question q,Answer a,Question_Answer qa wh
 
 exports.getDependent = async function getDependent(req, res) {
 
-    const DeviceId =req.params.deviceId;
-    
-    try{
+    const DeviceId = req.params.deviceId;
 
-        const selectRes =await db.pool.query(selectDevicedependent,[DeviceId]);
+    try {
 
-        if( selectRes.rows[0].dependentquestionid==null){
+        const selectRes = await db.pool.query(selectDevicedependent, [DeviceId]);
+
+        if (selectRes.rows[0].dependentquestionid == null) {
             res.status(404);
-            res.send({message:"Device does not have dependent question."});
+            res.send({ message: "Device does not have dependent question." });
             return;
         }
-      ;
+        ;
 
         const QuestionId = selectRes.rows[0].dependentquestionid;
         //------------------------------------------------------
         let responseJSON = {};
         const questions = [];
-        const questionsRes = await db.pool.query(selectQuestion,[QuestionId]);
+        const questionsRes = await db.pool.query(selectQuestion, [QuestionId]);
 
         let question = questionsRes.rows[0];
         const id = question.questionid;
@@ -245,7 +245,7 @@ exports.getDependent = async function getDependent(req, res) {
         questionJSON.QuestionAnswers = QuestionAnswers;
         questions.push(questionJSON);
 
-  
+
 
         responseJSON.success = true;
         responseJSON.Questions = questions;
@@ -254,9 +254,9 @@ exports.getDependent = async function getDependent(req, res) {
 
 
         res.status(200);
-        res.send({Question});
+        res.send({ Question });
 
-    }catch(err){
+    } catch (err) {
         console.log(err);
         res.status(400);
         res.send({
@@ -272,36 +272,36 @@ exports.getDependent = async function getDependent(req, res) {
 const selectResponseCount = "SELECT count(responseid) FROM userresponse where date = to_date($1, 'dd-mm-yyyy');"
 
 
-exports.countResponses = async function countResponses(req,res){
+exports.countResponses = async function countResponses(req, res) {
 
-    try{
+    try {
 
         let ts = Date.now();
 
         returnJSON = [];
 
-        for(let i = 6; i >= 0; i--){
+        for (let i = 6; i >= 0; i--) {
 
             let date_ob = new Date(ts);
-            date_ob.setDate(date_ob.getDate()-i);
+            date_ob.setDate(date_ob.getDate() - i);
             let date = date_ob.getDate();
             let month = date_ob.getMonth() + 1;
             let year = date_ob.getFullYear();
 
 
-            let iDate = date + '-'+month+'-'+year;
+            let iDate = date + '-' + month + '-' + year;
 
-            const countRes =await db.pool.query(selectResponseCount,[iDate]);
-            returnJSON.push({date:iDate,responseCount:countRes.rows[0].count});
-    
+            const countRes = await db.pool.query(selectResponseCount, [iDate]);
+            returnJSON.push({ date: iDate, responseCount: countRes.rows[0].count });
+
 
         }
-        
+
         res.status(200);
-        res.send(returnJSON); 
+        res.send(returnJSON);
         return;
 
-    }catch(err){
+    } catch (err) {
 
         console.log(err);
         res.status(400);
@@ -318,24 +318,24 @@ exports.countResponses = async function countResponses(req,res){
 const updateDevice = `Update FADevice 
 set campaignid = $1,devicename = $2,installationcode = $3 ,geotag = $4, tag = $5
 where deviceid = $6`;
-exports.editDevice = async function editDevice(req,res){
+exports.editDevice = async function editDevice(req, res) {
 
-    const {CampaignId,DeviceName,InstalaltionCode,GeoTag,Tag,DeviceId} = req.body;
+    const { CampaignId, DeviceName, InstalaltionCode, GeoTag, Tag, DeviceId } = req.body;
 
-    if(CampaignId == null ||DeviceName == null ||InstalaltionCode == null ||GeoTag == null || Tag == null ||DeviceId == null){
+    if (CampaignId == null || DeviceName == null || InstalaltionCode == null || GeoTag == null || Tag == null || DeviceId == null) {
         res.status(404);
         const error = new Error(4, "Invalid json format.");
         res.send(error);
         return;
     }
 
-    try{
+    try {
 
-       const updateRes = db.pool.query(updateDevice,[CampaignId,DeviceName,InstalaltionCode,,GeoTag,Tag,DeviceId]);
-       res.status(200);
-       res.send({success:true});
+        const updateRes = db.pool.query(updateDevice, [CampaignId, DeviceName, InstalaltionCode, , GeoTag, Tag, DeviceId]);
+        res.status(200);
+        res.send({ success: true });
 
-    }catch(err){
+    } catch (err) {
 
         console.log(err);
         res.status(400);
@@ -347,4 +347,26 @@ exports.editDevice = async function editDevice(req,res){
     }
 
 
+}
+
+
+const getDuration = `Select avg(Duration) from UserResponse`;
+
+exports.getDurationResponseOfUser = async function getDurationResponseOfUser(req, res) {
+
+    try {
+        db.pool.query(getDuration).then(r => {
+            res.status(200);
+            res.send({ ukupno_prosjecno_vrijeme: r.rows[0].avg });
+        }).catch(e => {
+            res.status(400).send({ error: e })
+        });
+    }
+    catch (err) {
+        res.status(400);;
+        res.send({
+            error: err
+        });
+        console.log(err);
+    }
 }
