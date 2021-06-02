@@ -96,7 +96,7 @@ exports.readFaDefintion = function (req, res) {
     if (user) {
         faDefintionService.readFaDefinitions((response) => {
             if(response === "Error"){
-                res.status(500).send({ message: "Something went wrong when editing FA definition." });
+                res.status(500).send({ message: "Something went wrong when retireving FA definition." });
             } else {
                 let faDefinitions = response;
                 console.log(faDefinitions);
@@ -119,7 +119,7 @@ exports.readFaById = function (req, res) {
     if (user) {
         faDefintionService.readFaDefinitionById(req.body.id, (response) => {
             if(response === "Error"){
-                res.status(500).send({ message: "Something went wrong when editing FA definition." });
+                res.status(500).send({ message: "Something went wrong when retrieving FA definition." });
             } else {
                 let faDefinitions = response;
                 console.log(faDefinitions);
