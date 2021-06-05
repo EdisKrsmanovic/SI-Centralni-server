@@ -3,7 +3,7 @@ const db = rep.pool;
 const Error = require('../models/error.js');
 require('dotenv').config()
 const jwt = require('jsonwebtoken')
-const fadeviceService = require('../services/deviceService')
+var moment = require('moment');
 
 exports.activateDevice = async function activateDevice(req, res) {
     const installation_code = req.params.code;
@@ -35,22 +35,29 @@ exports.activateDevice = async function activateDevice(req, res) {
     }
 }
 
-const insertResponse = " Insert into UserResponse(QuestionID,AnswerID,CustomAnswer,DeviceId,Duration) values($1,$2,$3,$4,$5)";
+const insertResponse = " Insert into UserResponse(QuestionID,AnswerID,CustomAnswer,SessionId) values($1,$2,$3,$4)";
+const insertSession = "Insert into ResponseSession(DeviceID, CampaignID, Duration, ResponseCount) values ($1,$2,$3,$4) Returning *;"
 exports.saveResponse = async function saveResponse(req, res) {
-    const responses = req.body.UserResponses;
-    const deviceid = req.body.DeviceId;
-    const duration = req.body.Duration;
-    if (responses == null) {
+
+    const{UserResponses,DeviceId,CampaignId,Duration} = req.body;
+    
+    if (UserResponses == null || DeviceId == null ||Duration==null) {
         res.status(404);
         const error = new Error(4, "Invalid json format.");
         res.send(error);
         return;
     }
-    for (let i = 0; i < responses.length; i++) {
-        let response = responses[i];
+    const responseCount = UserResponses.length;
+
+    const sessionInsertRes =await db.pool.query(insertSession,[DeviceId,CampaignId,Duration,responseCount]);
+
+    const sessionId = sessionInsertRes.rows[0].id;
+
+    for (let i = 0; i < UserResponses.length; i++) {
+        let response = UserResponses[i];
         if (response.AnswerId == -1) response.AnswerId = null;
         try {
-            const insertRes = await db.pool.query(insertResponse, [response.QuestionId, response.AnswerId, response.CustomAnswer,deviceid,duration]);
+            const insertRes = await db.pool.query(insertResponse, [response.QuestionId, response.AnswerId, response.CustomAnswer,sessionId]);
         } catch (err) {
             res.status(400);
             res.send({
@@ -67,27 +74,27 @@ exports.saveResponse = async function saveResponse(req, res) {
 
 
 const selectResponsesFull = `
-select q.questiontext, coalesce(a.answertext, 'Empty')  AS answertext , ur.customanswer , ur.date, ur.deviceid, fa.campaignid,fa.devicename
-from question q,answer a,userresponse ur ,fadevice fa
-where q.questionid = ur.questionid and ( a.answerid = ur.answerid) and ur.deviceid = fa.deviceid and fa.campaignid = $1
+select q.questiontext, coalesce(a.answertext, 'Empty')  AS answertext , ur.customanswer , rs.date, rs.deviceid, fa.campaignid,fa.devicename, fa.tag, fa.geotag
+from question q,answer a,userresponse ur ,fadevice fa, responsesession rs
+where q.questionid = ur.questionid and ( a.answerid = ur.answerid) and rs.deviceid = fa.deviceid and ur.sessionid = rs.id and rs.campaignid = $1
 
 UNION
 
-select q.questiontext, coalesce(null, ' ')  AS answertext , ur.customanswer , ur.date, ur.deviceid, fa.campaignid,fa.devicename
-from question q,userresponse ur ,fadevice fa
-where q.questionid = ur.questionid and ur.answerid is null and ur.deviceid = fa.deviceid and fa.campaignid = $2;
+select q.questiontext, coalesce(null, ' ')  AS answertext , ur.customanswer , rs.date, rs.deviceid, fa.campaignid,fa.devicename,fa.tag,fa.geotag
+from question q,userresponse ur ,fadevice fa, responsesession rs
+where q.questionid = ur.questionid and ur.answerid is null and rs.deviceid = fa.deviceid and ur.sessionid = rs.id and rs.campaignid = $2;
 
 `
 const selectResponsesDevice = `
-select q.questiontext, coalesce(a.answertext, 'Empty')  AS answertext , ur.customanswer , ur.date, ur.deviceid,fa.devicename
-from question q,answer a,userresponse ur , fadevice fa
-where q.questionid = ur.questionid and a.answerid = ur.answerid and ur.deviceid = fa.deviceid and fa.deviceid = $1
+select q.questiontext, coalesce(a.answertext, 'Empty')  AS answertext , ur.customanswer , rs.date, rs.deviceid, fa.campaignid,fa.devicename, fa.tag, fa.geotag
+from question q,answer a,userresponse ur ,fadevice fa, responsesession rs
+where q.questionid = ur.questionid and ( a.answerid = ur.answerid) and rs.deviceid = fa.deviceid and ur.sessionid = rs.id and fa.deviceid = $1
 
 UNION
 
-select q.questiontext, coalesce(null, ' ')  AS answertext , ur.customanswer , ur.date, ur.deviceid,fa.devicename
-from question q,userresponse ur , fadevice fa
-where q.questionid = ur.questionid and ur.answerid is null and ur.deviceid = fa.deviceid  and fa.deviceid = $2;
+select q.questiontext, coalesce(null, ' ')  AS answertext , ur.customanswer , rs.date, rs.deviceid, fa.campaignid,fa.devicename,fa.tag,fa.geotag
+from question q,userresponse ur ,fadevice fa, responsesession rs
+where q.questionid = ur.questionid and ur.answerid is null and rs.deviceid = fa.deviceid and ur.sessionid = rs.id and fa.deviceid = $2;
 `
 exports.getResponses = async function getResponses(req, res) {
 
@@ -125,6 +132,8 @@ exports.getResponses = async function getResponses(req, res) {
             resultJson.DeviceId = result.deviceid;
             resultJson.DeviceName = result.devicename;
             resultJson.Date = result.date;
+            resultJson.GeoTag = result.geotag;
+            resultJson.Tag = result.tag;
 
             returnJson.push(resultJson);
 
@@ -212,7 +221,7 @@ exports.getDependent = async function getDependent(req, res) {
             res.send({ message: "Device does not have dependent question." });
             return;
         }
-        ;
+        
 
         const QuestionId = selectRes.rows[0].dependentquestionid;
         //------------------------------------------------------
@@ -257,10 +266,6 @@ exports.getDependent = async function getDependent(req, res) {
         responseJSON.Questions = questions;
         res.send(responseJSON);
         return;
-
-
-        res.status(200);
-        res.send({ Question });
 
     } catch (err) {
         console.log(err);
@@ -377,23 +382,108 @@ function regenerateToken(token) {
     })
 }
 
-exports.readActiveNotActiveFadevice = function (req, res) {
-    const authHeader = req.headers['authorization']
-    const token = authHeader && authHeader.split(' ')[1];
-    const user = decodeToken(token);
+const selectActive = "Select * from fadevice where  lastping>=$1";
+//const selectActive = "Select * from fadevice";
+exports.readActiveNotActiveFadevice =async function (req, res) {
 
-    if (user) {
-        fadeviceService.readActiveNotActiveFadevice((response) => {
-            if (response === "Error") {
-                res.status(500).send({ message: "Something went wrong." });
-            } else {
-                console.log(response)
-                res.status(200).json({ aktivni: response.active, neaktivni: response.notactive });
-            }
-        });
+    try{
+        
+        let now = moment();
+        const tenMinutes= moment.duration("00:05:00");
+        now.subtract(tenMinutes);
 
-    } else {
-        res.status(401).send({ message: "Not authorized to perform action." })
+       const selectRes =await db.pool.query(selectActive,[now.format('DD-MM-yyyy HH:mm:ss')]);
+
+
+       let returnJSON = [];
+       for(let i = 0 ; i < selectRes.rowCount; i++){
+
+        const device = selectRes.rows[i];
+
+        const deviceJSON = {};
+        deviceJSON.deviceId = device.deviceid;
+        deviceJSON.Name = device.devicename;
+        deviceJSON.tag = device.tag;
+        deviceJSON.GeoTag = device.geotag;
+        deviceJSON.LastPing = device.lastping;
+
+        returnJSON.push(deviceJSON);
+
+       }
+
+
+      res.status(200);
+      res.send(returnJSON);
+
+    }catch(err){
+
+        console.log(err);
+        res.status(515);
+        const error = new Error(0, "Unknown server error");
+        res.send(error);
+
     }
 
+
+
 }
+
+const devicePinged = "Update fadevice set lastping = $1 where deviceid = $2";
+exports.devicePing =async function (req,res){
+
+    const deviceId = req.params.deviceId;
+
+
+    if(deviceId == null){
+        res.status(404);
+        const error = new Error(4, "Invalid json format.");
+        res.send(error);
+        return;
+    }
+
+    try{
+        
+        const updateRes =await db.pool.query(devicePinged,[moment().format('DD-MM-yyyy HH:mm:ss'),deviceId]);
+        res.status(200);
+        res.send({success:true});
+
+    }catch(err){
+        console.log(err);
+        res.status(515);
+        const error = new Error(0, "Unknown server error");
+        res.send(error);
+
+    }
+
+
+};
+
+const selectAverage = "select avg(duration),responsecount from responsesession where responsecount>1 group by responsecount";
+exports.getAverageDurations = async function (req,res){
+
+
+    try{
+        
+        const averageRes =await db.pool.query(selectAverage);
+
+        let returnJSON = [];
+        
+        for(let i = 0 ;i<averageRes.rowCount; i++ ){
+
+            const average = averageRes.rows[i];
+            returnJSON.push({AverageTime:average.avg, ResponseCount:average.responsecount});
+
+        }
+
+        res.status(200);
+        res.send(returnJSON);
+        return;
+    }catch(err){
+        console.log(err);
+        res.status(515);
+        const error = new Error(0, "Unknown server error");
+        res.send(error);
+
+    }
+
+};

@@ -17,14 +17,11 @@ DROP TABLE IF EXISTS FADevice CASCADE;
 DROP TABLE IF EXISTS Question CASCADE;
 DROP TABLE IF EXISTS Campaign CASCADE;
 DROP TABLE IF EXISTS Answer CASCADE;
+DROP TABLE IF EXISTS ResponseSession CASCADE;
 `
 const generateDB = `
 
---**********************************************************************
---	Tables
---**********************************************************************
 
--- Table Answer
 CREATE TABLE
 	Answer
 (
@@ -65,6 +62,7 @@ CREATE TABLE
     , DependentQuestionID INT NULL
     , GeoTag text NOT NULL
     , Tag text NOT NULL
+    , LastPing TIMESTAMP
 ,
 CONSTRAINT Pk_FADevice_DeviceID PRIMARY KEY
 (
@@ -105,6 +103,8 @@ CONSTRAINT Pk_QuestionAnswer_ID PRIMARY KEY
 )
 );
 
+
+
 -- Table UserResponse
 CREATE TABLE
 	UserResponse
@@ -113,15 +113,33 @@ CREATE TABLE
 	, CustomAnswer TEXT NULL
 	, QuestionID INT NOT NULL
 	, AnswerID INT
-    , Duration INT
-    , DeviceID INT NOT NULL
-    , Date Date Default Current_Timestamp
+    , SessionID INT NOT NULL
+
 ,
 CONSTRAINT Pk_UserResponse_ResponseID PRIMARY KEY
 (
 	ResponseID
 )
 );
+
+
+-- Table ResponseSession
+CREATE TABLE
+	ResponseSession
+(
+	ID SERIAL NOT NULL
+    , Date Timestamp Default Current_Timestamp
+    , DeviceID INT NOT NULL
+    , CampaignID INT
+    , Duration INT
+    , ResponseCount INT
+,
+CONSTRAINT Pk_ResponseSession_ID PRIMARY KEY
+(
+	ID
+)
+);
+
 --**********************************************************************
 --	Data
 --**********************************************************************
@@ -132,6 +150,10 @@ CONSTRAINT Pk_UserResponse_ResponseID PRIMARY KEY
 -- Relationship Fk_Campaign_FADevice_CampaignID
 ALTER TABLE FADevice
 ADD CONSTRAINT Fk_Campaign_FADevice_CampaignID FOREIGN KEY (CampaignID) REFERENCES Campaign (CampaignID) ON DELETE SET NULL;
+
+-- Relationship Fk_UserResponse_Session_SessionID
+ALTER TABLE UserResponse
+ADD CONSTRAINT Fk_UserResponse_Session_SessionID FOREIGN KEY (SessionID) REFERENCES ResponseSession (ID) ON DELETE CASCADE;
 
 
 -- Relationship Fk_Campaign_Question_CampaignID
@@ -157,14 +179,12 @@ ADD CONSTRAINT Fk_Question_QuestionAnswer_QuestionID FOREIGN KEY (QuestionID) RE
 ALTER TABLE UserResponse
 ADD CONSTRAINT Fk_Question_UserResponse_QuestionID FOREIGN KEY (QuestionID) REFERENCES Question (QuestionID) ON DELETE CASCADE;
 
--- Relationship Fk_Question_UserResponse_DeviceID
-ALTER TABLE UserResponse
-ADD CONSTRAINT Fk_Question_UserResponse_DeviceID FOREIGN KEY (DeviceID) REFERENCES FADevice (DeviceID) ON DELETE CASCADE;
-
 
 -- Relationship Fk_Answer_UserResponse_AnswerID
 ALTER TABLE UserResponse
 ADD CONSTRAINT Fk_Answer_UserResponse_AnswerID FOREIGN KEY (AnswerID) REFERENCES Answer (AnswerID) ON DELETE CASCADE;
+
+
 
 `
 
@@ -208,6 +228,7 @@ module.exports.fillDB = async function fillDB() {
     TRUNCATE TABLE FADevice cascade;
     TRUNCATE TABLE UserResponse cascade;
     TRUNCATE TABLE Question_Answer cascade;
+    TRUNCATE TABLE ResponseSession cascade;
 
     ALTER SEQUENCE answer_answerid_seq RESTART WITH 1;
     ALTER SEQUENCE campaign_campaignid_seq RESTART WITH 1;
@@ -215,6 +236,7 @@ module.exports.fillDB = async function fillDB() {
     ALTER SEQUENCE fadevice_deviceid_seq RESTART WITH 1;
     ALTER SEQUENCE question_questionid_seq RESTART WITH 1;
     ALTER SEQUENCE userresponse_responseid_seq RESTART WITH 1;
+    ALTER SEQUENCE responsesession_id_seq RESTART WITH 1;
 
 
     INSERT INTO Campaign (name, startdate, enddate) VALUES ( 'Zadovoljstvo korisnika sa našim proizvodima', To_Date('21-05-2021', 'dd-mm-yyyy'), To_Date('21-05-2021', 'dd-mm-yyyy'));
