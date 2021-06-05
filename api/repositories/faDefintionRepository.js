@@ -2,7 +2,7 @@
 const bcrypt = require("bcrypt");
 const pg = require('pg');
 const pool = new pg.Pool({
-       user: process.env.DB_USER,
+        user: process.env.DB_USER,
         host: process.env.DB_HOST,
         database: process.env.DB_DATABASE,
         password: process.env.DB_PASSWORD,
@@ -16,8 +16,8 @@ const pool = new pg.Pool({
     host: '127.0.0.1',
     database: 'SI-DB',
     password: '1234',
-    port: 5432,
-*/
+    port: 5432,*/
+
     }
       
 );

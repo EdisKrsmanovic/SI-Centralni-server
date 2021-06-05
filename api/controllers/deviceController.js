@@ -280,7 +280,7 @@ exports.getDependent = async function getDependent(req, res) {
 }
 
 
-const selectResponseCount = "SELECT count(responseid) FROM userresponse where date = to_date($1, 'dd-mm-yyyy');"
+const selectResponseCount = "SELECT count(id) FROM responsesession where  CAST(date AS DATE) = to_date($1, 'dd-mm-yyyy');"
 
 
 exports.countResponses = async function countResponses(req, res) {
