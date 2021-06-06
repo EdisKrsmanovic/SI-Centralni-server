@@ -382,7 +382,8 @@ function regenerateToken(token) {
     })
 }
 
-const selectActive = "Select * from fadevice where  lastping>=$1";
+const selectActive = "Select count(*) from fadevice where  lastping>=$1";
+const selectInActive = "Select count(*) from fadevice where  lastping<$1 or lastping is null";
 //const selectActive = "Select * from fadevice";
 exports.readActiveNotActiveFadevice =async function (req, res) {
 
@@ -394,22 +395,9 @@ exports.readActiveNotActiveFadevice =async function (req, res) {
 
        const selectRes =await db.pool.query(selectActive,[now.format('DD-MM-yyyy HH:mm:ss')]);
 
+       const selectResInactive =await db.pool.query(selectInActive,[now.format('DD-MM-yyyy HH:mm:ss')]);
 
-       let returnJSON = [];
-       for(let i = 0 ; i < selectRes.rowCount; i++){
-
-        const device = selectRes.rows[i];
-
-        const deviceJSON = {};
-        deviceJSON.deviceId = device.deviceid;
-        deviceJSON.Name = device.devicename;
-        deviceJSON.tag = device.tag;
-        deviceJSON.GeoTag = device.geotag;
-        deviceJSON.LastPing = device.lastping;
-
-        returnJSON.push(deviceJSON);
-
-       }
+       let returnJSON = {Active:selectRes.rows[0].count,Inactive:selectResInactive.rows[0].count};
 
 
       res.status(200);
