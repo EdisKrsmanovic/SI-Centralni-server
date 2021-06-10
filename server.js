@@ -13,8 +13,8 @@ const questionRoutes = require('./api/routes/questionRoutes');
 const answerRoutes = require('./api/routes/answerRoutes');
 const deviceRoutes = require('./api/routes/deviceRoutes');
 
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+app.use(bodyParser.urlencoded( {limit: '30mb', extended: true} ));
+app.use(bodyParser.json({limit: '30mb'}));
 app.use(cors());
 
 DBStartHelper.resetDB().then(() => {
